@@ -6,6 +6,7 @@ require 'mongoid'
 require 'bson'
 
 require './configure_mongo'
+require './models'
 
 # set sinatra's variables
 set :app_file, __FILE__
@@ -14,19 +15,17 @@ set :public_folder, 'public'
 
 
 get '/upload' do
-  jsonData = File.read(File.join('public', 'enrollments.json'))
-  #puts jsonData
+  jsonData = File.read(File.join('public', 'pending-policy-summary.json'))
+  policies = JSON.parse(jsonData)
 
-  enrollments = JSON.parse(jsonData)
-
-  puts enrollments[0]["name"]
+  #puts policy[0]["name"]
 
   #newEpic = Policy.create(enrollments[0])
 
-  Policy.collection.insert(enrollments)
+  Policy.collection.insert(policies)
 
   content_type :json
-  { :key1 => 'value1', :key2 => 'value2' }.to_json
+  {:success => 'true'}.to_json
 
 end
 
@@ -34,14 +33,5 @@ get '/policies' do
   policies = Policy.all
 
   policies.to_json
-
 end
 
-
-
-
-class Policy
-  include Mongoid::Document
-  field :id
-  field :name
-end
